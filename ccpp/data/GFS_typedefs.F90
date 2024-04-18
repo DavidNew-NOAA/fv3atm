@@ -1603,7 +1603,7 @@ module GFS_typedefs
     real(kind=kind_phys) :: iau_delthrs     ! iau time interval (to scale increments) in hours
     character(len=240)   :: iau_inc_files(7)! list of increment files
     real(kind=kind_phys) :: iaufhrs(7)      ! forecast hours associated with increment files
-    logical :: iau_filter_increments, iau_drymassfixer
+    logical :: iau_filter_increments, iau_drymassfixer, iau_gaussian
 
     ! From physcons.F90, updated/set in control_initialize
     real(kind=kind_phys) :: dxinv           ! inverse scaling factor for critical relative humidity, replaces dxinv in physcons.F90
@@ -3885,11 +3885,12 @@ module GFS_typedefs
     logical              :: ca_trigger     = .false.
 
 !--- IAU options
-    real(kind=kind_phys)  :: iau_delthrs      = 0           !< iau time interval (to scale increments)
-    character(len=240)    :: iau_inc_files(7) = ''          !< list of increment files
-    real(kind=kind_phys)  :: iaufhrs(7)       = -1          !< forecast hours associated with increment files
-    logical  :: iau_filter_increments         = .false.     !< filter IAU increments
-    logical  :: iau_drymassfixer              = .false.     !< IAU dry mass fixer
+    real(kind=kind_phys)  :: iau_delthrs           = 0       !< iau time interval (to scale increments)
+    character(len=240)    :: iau_inc_files(7)      = ''      !< list of increment files
+    real(kind=kind_phys)  :: iaufhrs(7)            = -1      !< forecast hours associated with increment files
+    logical               :: iau_filter_increments = .false. !< filter IAU increments
+    logical               :: iau_gaussian          = .true.  !< Read IAU increments in gaussian format (true) or cubed_sphere (false)
+    logical               :: iau_drymassfixer      = .false. !< IAU dry mass fixer
 
 !--- debug flags
     logical              :: debug          = .false.
@@ -4104,7 +4105,7 @@ module GFS_typedefs
                                nspinup,ca_amplitude,nsmooth,ca_closure,ca_entr,ca_trigger,  &
                           !--- IAU
                                iau_delthrs,iaufhrs,iau_inc_files,iau_filter_increments,     &
-                               iau_drymassfixer,                                            &
+                               iau_drymassfixer, iau_gaussian,                              &
                           !--- debug options
                                debug, pre_rad, print_diff_pgr,                              &
                           !--- parameter range for critical relative humidity
@@ -5106,11 +5107,12 @@ module GFS_typedefs
 
     ! IAU flags
     !--- iau parameters
-    Model%iaufhrs         = iaufhrs
-    Model%iau_inc_files   = iau_inc_files
-    Model%iau_delthrs     = iau_delthrs
+    Model%iaufhrs               = iaufhrs
+    Model%iau_inc_files         = iau_inc_files
+    Model%iau_delthrs           = iau_delthrs
     Model%iau_filter_increments = iau_filter_increments
-    Model%iau_drymassfixer = iau_drymassfixer
+    Model%iau_gaussian          = iau_gaussian
+    Model%iau_drymassfixer      = iau_drymassfixer
     if(Model%me==0) print *,' model init,iaufhrs=',Model%iaufhrs
 
 !--- debug flags
